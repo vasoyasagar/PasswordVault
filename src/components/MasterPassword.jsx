@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import ThemeToggle from './ThemeToggle';
 
 export default function MasterPassword({ user, onUnlock, onSignOut, loading, error }) {
   const [password, setPassword] = useState('');
@@ -11,6 +12,7 @@ export default function MasterPassword({ user, onUnlock, onSignOut, loading, err
 
   return (
     <div className="screen">
+      <div className="theme-toggle-float"><ThemeToggle /></div>
       <div className="card master-card">
         <div className="master-user">
           {user?.picture && <img src={user.picture} alt="" className="avatar" referrerPolicy="no-referrer" />}

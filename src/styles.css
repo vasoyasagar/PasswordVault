@@ -31,6 +31,35 @@
   --radius: 16px;
   --radius-md: 12px;
   --radius-sm: 8px;
+  --shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+  --google-btn-bg: #fff;
+  --google-btn-color: #333;
+}
+
+[data-theme="light"] {
+  --bg: #f5f5fa;
+  --bg2: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f0f0f5;
+  --bg-input: #f0f0f5;
+  --accent: #6c5ce7;
+  --accent-hover: #5a4bd1;
+  --accent-dim: rgba(108, 92, 231, 0.1);
+  --danger: #e84343;
+  --danger-dim: rgba(232, 67, 67, 0.1);
+  --success: #27ae60;
+  --success-dim: rgba(39, 174, 96, 0.1);
+  --warning: #e67e22;
+  --warning-dim: rgba(230, 126, 34, 0.1);
+  --blue: #2d3aed;
+  --blue-dim: rgba(45, 58, 237, 0.1);
+  --text: #1a1a2e;
+  --text2: #666680;
+  --text-muted: #9999aa;
+  --border: #e0e0ea;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --google-btn-bg: #fff;
+  --google-btn-color: #333;
 }
 
 html { height: 100%; }
@@ -103,7 +132,7 @@ a { color: var(--accent); text-decoration: none; }
   padding: 40px 28px;
   width: 100%;
   max-width: 420px;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow);
 }
 
 /* ===== LOGIN ===== */
@@ -127,13 +156,13 @@ a { color: var(--accent); text-decoration: none; }
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  background: #fff;
-  color: #333;
+  background: var(--google-btn-bg);
+  color: var(--google-btn-color);
   font-size: 15px;
   font-weight: 500;
   padding: 12px 28px;
   border-radius: var(--radius-sm);
-  border: none;
+  border: 1px solid var(--border);
   cursor: pointer;
   transition: transform 0.15s, box-shadow 0.15s;
 }
@@ -468,6 +497,13 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); }
   border-radius: var(--radius-sm);
 }
 
+/* ===== THEME TOGGLE FLOAT ===== */
+.theme-toggle-float {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
 /* ===== DEBIT CARD VISUAL ===== */
 .card-visual {
   background: linear-gradient(135deg, #1a1a3e, #2a1a4e);
@@ -475,6 +511,7 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); }
   border-radius: var(--radius-md);
   padding: 16px;
   margin-bottom: 8px;
+  color: #eee;
 }
 .card-number {
   font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;

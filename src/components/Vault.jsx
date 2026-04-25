@@ -2,6 +2,7 @@ import { useState } from 'react';
 import EntryCard from './EntryCard';
 import EntryForm from './EntryForm';
 import PaymentHistory from './PaymentHistory';
+import ThemeToggle from './ThemeToggle';
 
 const TABS = [
   { key: 'all', label: 'All', icon: '📋' },
@@ -127,6 +128,7 @@ export default function Vault({
           <h1>Vault</h1>
         </div>
         <div className="vault-header-right">
+          <ThemeToggle />
           <button className="icon-btn" onClick={onSync} disabled={loading} title="Sync">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={loading ? 'spin' : ''}>
               <polyline points="23 4 23 10 17 10" /><polyline points="1 20 1 14 7 14" />

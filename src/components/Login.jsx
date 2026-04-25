@@ -1,6 +1,9 @@
+import ThemeToggle from './ThemeToggle';
+
 export default function Login({ onSignIn, error }) {
   return (
     <div className="screen">
+      <div className="theme-toggle-float"><ThemeToggle /></div>
       <div className="card login-card">
         <div className="login-icon">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#7c6aff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
