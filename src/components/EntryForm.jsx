@@ -17,6 +17,8 @@ export default function EntryForm({ entry, defaultCategory, onSave, onClose }) {
   const [personName, setPersonName] = useState(entry?.personName || '');
   const [amount, setAmount] = useState(entry?.amount || '');
   const [interestRate, setInterestRate] = useState(entry?.interestRate || '');
+  const [interestPeriod, setInterestPeriod] = useState(entry?.interestPeriod || '');
+  const [interestPeriodUnit, setInterestPeriodUnit] = useState(entry?.interestPeriodUnit || 'month');
   const [dateGiven, setDateGiven] = useState(entry?.dateGiven || '');
 
   // Card fields
@@ -57,7 +59,7 @@ export default function EntryForm({ entry, defaultCategory, onSave, onClose }) {
 
     if (category === 'money') {
       if (!personName.trim()) return;
-      data = { ...data, title: personName.trim(), personName: personName.trim(), amount: parseFloat(amount) || 0, interestRate: parseFloat(interestRate) || 0, dateGiven, payments: entry?.payments || [] };
+      data = { ...data, title: personName.trim(), personName: personName.trim(), amount: parseFloat(amount) || 0, interestRate: parseFloat(interestRate) || 0, interestPeriod: parseInt(interestPeriod) || 0, interestPeriodUnit, dateGiven, payments: entry?.payments || [] };
     } else if (category === 'card') {
       if (!cardTitle.trim()) return;
       data = { ...data, title: cardTitle.trim(), cardHolder: cardHolder.trim(), cardNumber: cardNumber.trim(), expiryDate: expiryDate.trim(), cvv: cvv.trim(), pin: cardPin.trim() };
@@ -139,6 +141,19 @@ export default function EntryForm({ entry, defaultCategory, onSave, onClose }) {
                 <div className="form-field">
                   <label>Interest Rate (%)</label>
                   <input type="number" step="0.1" value={interestRate} onChange={(e) => setInterestRate(e.target.value)} placeholder="12" inputMode="decimal" />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-field">
+                  <label>Interest Every</label>
+                  <input type="number" value={interestPeriod} onChange={(e) => setInterestPeriod(e.target.value)} placeholder="6" inputMode="numeric" min="1" />
+                </div>
+                <div className="form-field">
+                  <label>Period Unit</label>
+                  <select value={interestPeriodUnit} onChange={(e) => setInterestPeriodUnit(e.target.value)}>
+                    <option value="month">Month(s)</option>
+                    <option value="year">Year(s)</option>
+                  </select>
                 </div>
               </div>
               <div className="form-field">

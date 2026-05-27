@@ -497,6 +497,85 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); }
   border-radius: var(--radius-sm);
 }
 
+/* ===== DUE BADGE ===== */
+.due-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.due-paid { color: var(--success); background: var(--success-dim); }
+.due-overdue { color: var(--danger); background: var(--danger-dim); }
+.due-due-soon { color: var(--warning); background: var(--warning-dim); }
+.due-upcoming { color: var(--text2); background: rgba(136, 136, 170, 0.12); }
+
+/* ===== CYCLE INFO ===== */
+.cycle-info {
+  margin: 8px 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  border-left: 3px solid var(--text-muted);
+}
+.cycle-info.cycle-paid { border-left-color: var(--success); }
+.cycle-info.cycle-overdue { border-left-color: var(--danger); }
+.cycle-info.cycle-due-soon { border-left-color: var(--warning); }
+.cycle-info.cycle-upcoming { border-left-color: var(--accent); }
+.cycle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 0;
+}
+.cycle-label { font-size: 12px; color: var(--text-muted); }
+.cycle-value { font-size: 13px; font-weight: 600; color: var(--text1); }
+.cycle-value.text-warning { color: var(--warning); }
+.cycle-value.text-success { color: var(--success); }
+
+/* ===== UPCOMING DUES ===== */
+.upcoming-dues {
+  margin: 12px 0;
+  padding: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.upcoming-dues-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--text1);
+}
+.upcoming-list { display: flex; flex-direction: column; gap: 8px; }
+.upcoming-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  border-left: 3px solid var(--text-muted);
+}
+.upcoming-item.upcoming-overdue { border-left-color: var(--danger); }
+.upcoming-item.upcoming-due-soon { border-left-color: var(--warning); }
+.upcoming-item.upcoming-upcoming { border-left-color: var(--accent); }
+.upcoming-left { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.upcoming-name { font-size: 14px; font-weight: 600; color: var(--text1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.upcoming-detail { font-size: 12px; color: var(--text2); }
+.upcoming-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+.upcoming-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+.badge-overdue { color: var(--danger); background: var(--danger-dim); }
+.badge-due-soon { color: var(--warning); background: var(--warning-dim); }
+.badge-upcoming { color: var(--accent); background: var(--accent-dim); }
+.upcoming-remaining { font-size: 11px; color: var(--warning); }
+
 /* ===== THEME TOGGLE FLOAT ===== */
 .theme-toggle-float {
   position: absolute;

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { getInterestCycleInfo } from '../services/interest';
 
 export default function EntryCard({ entry, onEdit, onDelete, onViewPayments }) {
   const [showSecret, setShowSecret] = useState(false);
@@ -45,6 +46,7 @@ export default function EntryCard({ entry, onEdit, onDelete, onViewPayments }) {
   if (entry.category === 'money') {
     const totalPaid = (entry.payments || []).reduce((s, p) => s + (parseFloat(p.amount) || 0), 0);
     const lastPayment = (entry.payments || []).slice(-1)[0];
+    const cycleInfo = getInterestCycleInfo(entry);
     return (
       <div className="entry-card money-card-entry">
         <div className="entry-header">
@@ -53,8 +55,43 @@ export default function EntryCard({ entry, onEdit, onDelete, onViewPayments }) {
             <span className="entry-title">{entry.personName || entry.title}</span>
             {entry.title && entry.personName && <span className="entry-sub">{entry.title}</span>}
           </div>
-          <span className="entry-category cat-money">Money</span>
+          {cycleInfo && (
+            <span className={`due-badge due-${cycleInfo.status}`}>
+              {cycleInfo.status === 'paid' && '✓ Paid'}
+              {cycleInfo.status === 'overdue' && `Overdue ${Math.abs(cycleInfo.daysUntilDue)}d`}
+              {cycleInfo.status === 'due-soon' && `Due ${cycleInfo.daysUntilDue}d`}
+              {cycleInfo.status === 'upcoming' && `${cycleInfo.daysUntilDue}d`}
+            </span>
+          )}
+          {!cycleInfo && <span className="entry-category cat-money">Money</span>}
         </div>
+
+        {/* Interest Cycle Info */}
+        {cycleInfo && (
+          <div className={`cycle-info cycle-${cycleInfo.status}`}>
+            <div className="cycle-row">
+              <span className="cycle-label">Expected</span>
+              <span className="cycle-value">₹{cycleInfo.expectedAmount.toLocaleString('en-IN')} / {cycleInfo.periodLabel}</span>
+            </div>
+            <div className="cycle-row">
+              <span className="cycle-label">Due Date</span>
+              <span className="cycle-value">{cycleInfo.nextDueDate}</span>
+            </div>
+            {cycleInfo.paidThisCycle > 0 && cycleInfo.remaining > 0 && (
+              <div className="cycle-row">
+                <span className="cycle-label">Remaining</span>
+                <span className="cycle-value text-warning">₹{cycleInfo.remaining.toLocaleString('en-IN')}</span>
+              </div>
+            )}
+            {cycleInfo.paidThisCycle > 0 && (
+              <div className="cycle-row">
+                <span className="cycle-label">Paid</span>
+                <span className="cycle-value text-success">₹{cycleInfo.paidThisCycle.toLocaleString('en-IN')}</span>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="money-details">
           <div className="money-grid">
             <div className="money-stat">

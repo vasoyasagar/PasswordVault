@@ -3,6 +3,7 @@ import EntryCard from './EntryCard';
 import EntryForm from './EntryForm';
 import PaymentHistory from './PaymentHistory';
 import ThemeToggle from './ThemeToggle';
+import { getUpcomingDues } from '../services/interest';
 
 const TABS = [
   { key: 'all', label: 'All', icon: '📋' },
@@ -193,6 +194,39 @@ export default function Vault({
               <span className="summary-label">Interest Received</span>
               <span className="summary-value text-success">₹{totalInterestReceived.toLocaleString('en-IN')}</span>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Upcoming Dues */}
+      {(activeTab === 'money' || activeTab === 'all') && getUpcomingDues(entries).length > 0 && (
+        <div className="upcoming-dues">
+          <h3 className="upcoming-dues-title">📅 Upcoming Interest Dues</h3>
+          <div className="upcoming-list">
+            {getUpcomingDues(entries).map((due) => (
+              <div key={due.entry.id} className={`upcoming-item upcoming-${due.status}`}>
+                <div className="upcoming-left">
+                  <span className="upcoming-name">{due.entry.personName || due.entry.title}</span>
+                  <span className="upcoming-detail">
+                    ₹{due.expectedAmount.toLocaleString('en-IN')} · Due {due.nextDueDate}
+                  </span>
+                </div>
+                <div className="upcoming-right">
+                  {due.status === 'overdue' && (
+                    <span className="upcoming-badge badge-overdue">Overdue {Math.abs(due.daysUntilDue)}d</span>
+                  )}
+                  {due.status === 'due-soon' && (
+                    <span className="upcoming-badge badge-due-soon">{due.daysUntilDue}d left</span>
+                  )}
+                  {due.status === 'upcoming' && (
+                    <span className="upcoming-badge badge-upcoming">{due.daysUntilDue}d</span>
+                  )}
+                  {due.remaining < due.expectedAmount && due.remaining > 0 && (
+                    <span className="upcoming-remaining">₹{due.remaining.toLocaleString('en-IN')} left</span>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
