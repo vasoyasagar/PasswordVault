@@ -16,6 +16,7 @@ export default function EntryForm({ entry, defaultCategory, onSave, onClose }) {
   // Money fields
   const [personName, setPersonName] = useState(entry?.personName || '');
   const [amount, setAmount] = useState(entry?.amount || '');
+  const [noInterest, setNoInterest] = useState(entry?.noInterest || false);
   const [interestRate, setInterestRate] = useState(entry?.interestRate || '');
   const [interestPeriod, setInterestPeriod] = useState(entry?.interestPeriod || '');
   const [interestPeriodUnit, setInterestPeriodUnit] = useState(entry?.interestPeriodUnit || 'month');
@@ -59,7 +60,7 @@ export default function EntryForm({ entry, defaultCategory, onSave, onClose }) {
 
     if (category === 'money') {
       if (!personName.trim()) return;
-      data = { ...data, title: personName.trim(), personName: personName.trim(), amount: parseFloat(amount) || 0, interestRate: parseFloat(interestRate) || 0, interestPeriod: parseInt(interestPeriod) || 0, interestPeriodUnit, dateGiven, payments: entry?.payments || [] };
+      data = { ...data, title: personName.trim(), personName: personName.trim(), amount: parseFloat(amount) || 0, noInterest, interestRate: noInterest ? 0 : (parseFloat(interestRate) || 0), interestPeriod: noInterest ? 0 : (parseInt(interestPeriod) || 0), interestPeriodUnit, dateGiven, payments: entry?.payments || [] };
     } else if (category === 'card') {
       if (!cardTitle.trim()) return;
       data = { ...data, title: cardTitle.trim(), cardHolder: cardHolder.trim(), cardNumber: cardNumber.trim(), expiryDate: expiryDate.trim(), cvv: cvv.trim(), pin: cardPin.trim() };
@@ -133,29 +134,37 @@ export default function EntryForm({ entry, defaultCategory, onSave, onClose }) {
                 <label>Person Name *</label>
                 <input type="text" value={personName} onChange={(e) => setPersonName(e.target.value)} placeholder="Who did you give money to?" autoFocus required />
               </div>
-              <div className="form-row">
-                <div className="form-field">
-                  <label>Amount (₹) *</label>
-                  <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="50000" inputMode="numeric" />
-                </div>
-                <div className="form-field">
-                  <label>Interest Rate (%)</label>
-                  <input type="number" step="0.1" value={interestRate} onChange={(e) => setInterestRate(e.target.value)} placeholder="12" inputMode="decimal" />
-                </div>
+              <div className="form-field">
+                <label>Amount (₹) *</label>
+                <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="50000" inputMode="numeric" />
               </div>
-              <div className="form-row">
-                <div className="form-field">
-                  <label>Interest Every</label>
-                  <input type="number" value={interestPeriod} onChange={(e) => setInterestPeriod(e.target.value)} placeholder="6" inputMode="numeric" min="1" />
-                </div>
-                <div className="form-field">
-                  <label>Period Unit</label>
-                  <select value={interestPeriodUnit} onChange={(e) => setInterestPeriodUnit(e.target.value)}>
-                    <option value="month">Month(s)</option>
-                    <option value="year">Year(s)</option>
-                  </select>
-                </div>
+              <div className="form-field checkbox-field">
+                <label className="checkbox-label">
+                  <input type="checkbox" checked={noInterest} onChange={(e) => setNoInterest(e.target.checked)} />
+                  <span>No Interest</span>
+                </label>
               </div>
+              {!noInterest && (
+                <>
+                  <div className="form-row">
+                    <div className="form-field">
+                      <label>Interest Rate (% / month)</label>
+                      <input type="number" step="0.1" value={interestRate} onChange={(e) => setInterestRate(e.target.value)} placeholder="2" inputMode="decimal" />
+                    </div>
+                    <div className="form-field">
+                      <label>Interest Every</label>
+                      <input type="number" value={interestPeriod} onChange={(e) => setInterestPeriod(e.target.value)} placeholder="1" inputMode="numeric" min="1" />
+                    </div>
+                  </div>
+                  <div className="form-field">
+                    <label>Period Unit</label>
+                    <select value={interestPeriodUnit} onChange={(e) => setInterestPeriodUnit(e.target.value)}>
+                      <option value="month">Month(s)</option>
+                      <option value="year">Year(s)</option>
+                    </select>
+                  </div>
+                </>
+              )}
               <div className="form-field">
                 <label>Date Given</label>
                 <input type="date" value={dateGiven} onChange={(e) => setDateGiven(e.target.value)} />

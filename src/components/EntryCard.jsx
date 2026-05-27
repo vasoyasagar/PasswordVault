@@ -63,7 +63,8 @@ export default function EntryCard({ entry, onEdit, onDelete, onViewPayments }) {
               {cycleInfo.status === 'upcoming' && `${cycleInfo.daysUntilDue}d`}
             </span>
           )}
-          {!cycleInfo && <span className="entry-category cat-money">Money</span>}
+          {!cycleInfo && entry.noInterest && <span className="entry-category cat-other">No Interest</span>}
+          {!cycleInfo && !entry.noInterest && <span className="entry-category cat-money">Money</span>}
         </div>
 
         {/* Interest Cycle Info */}

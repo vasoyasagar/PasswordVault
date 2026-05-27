@@ -749,6 +749,35 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); }
 .form-row > .form-field { flex: 1; }
 .form-row-3 > .form-field { flex: 1; min-width: 0; }
 
+/* Checkbox field */
+.checkbox-field { margin: 4px 0 8px; }
+.checkbox-field label {
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 14px;
+  color: var(--text1);
+  margin-bottom: 0;
+}
+.checkbox-label {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text1);
+  cursor: pointer;
+  padding: 10px 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
 /* ===== PAYMENT MODAL ===== */
 .payment-modal { max-height: 85vh; }
 .payment-summary {
