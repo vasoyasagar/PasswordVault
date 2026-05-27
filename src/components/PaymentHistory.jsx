@@ -1,5 +1,12 @@
 import { useState } from 'react';
 
+function fmtDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  if (isNaN(d)) return dateStr;
+  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
 export default function PaymentHistory({ entry, onAddPayment, onDeletePayment, onClose }) {
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -87,7 +94,7 @@ export default function PaymentHistory({ entry, onAddPayment, onDeletePayment, o
             <div key={p.id} className="payment-item">
               <div className="payment-item-left">
                 <span className="payment-amount">₹{parseFloat(p.amount).toLocaleString('en-IN')}</span>
-                <span className="payment-date">{p.date}</span>
+                <span className="payment-date">{fmtDate(p.date)}</span>
                 {p.note && <span className="payment-note">{p.note}</span>}
               </div>
               <button

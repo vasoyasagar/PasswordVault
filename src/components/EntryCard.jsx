@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import { getInterestCycleInfo } from '../services/interest';
 
+function fmtDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  if (isNaN(d)) return dateStr;
+  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
 export default function EntryCard({ entry, onEdit, onDelete, onViewPayments }) {
   const [showSecret, setShowSecret] = useState(false);
   const [copied, setCopied] = useState('');
@@ -105,7 +112,7 @@ export default function EntryCard({ entry, onEdit, onDelete, onViewPayments }) {
             </div>
             <div className="money-stat">
               <span className="money-stat-label">Given On</span>
-              <span className="money-stat-value">{entry.dateGiven || '—'}</span>
+              <span className="money-stat-value">{fmtDate(entry.dateGiven)}</span>
             </div>
             <div className="money-stat">
               <span className="money-stat-label">Received</span>
@@ -114,7 +121,7 @@ export default function EntryCard({ entry, onEdit, onDelete, onViewPayments }) {
           </div>
           {lastPayment && (
             <div className="money-last-payment">
-              Last: ₹{parseFloat(lastPayment.amount).toLocaleString('en-IN')} on {lastPayment.date}
+              Last: ₹{parseFloat(lastPayment.amount).toLocaleString('en-IN')} on {fmtDate(lastPayment.date)}
               {lastPayment.note && ` — ${lastPayment.note}`}
             </div>
           )}
