@@ -18,30 +18,34 @@ export function getInterestCycleInfo(entry) {
   const periodInMonths = unit === 'year' ? period * 12 : period;
   const expectedAmount = Math.round(principal * (ratePercent / 100) * periodInMonths);
 
-  // Calculate all cycle boundaries from dateGiven
   const startDate = new Date(entry.dateGiven);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // Find the current cycle
-  let cycleStart = new Date(startDate);
-  let cycleEnd = addPeriod(cycleStart, period, unit);
+  const payments = entry.payments || [];
 
-  while (cycleEnd <= today) {
-    cycleStart = new Date(cycleEnd);
-    cycleEnd = addPeriod(cycleStart, period, unit);
+  // Cycle starts from the last payment date, or dateGiven if no payments
+  let cycleStart;
+  if (payments.length > 0) {
+    const sortedPayments = [...payments].sort((a, b) =>
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+    cycleStart = new Date(sortedPayments[0].date);
+  } else {
+    cycleStart = new Date(startDate);
   }
+  cycleStart.setHours(0, 0, 0, 0);
 
-  // cycleStart -> cycleEnd is the current cycle
-  // The due date is cycleEnd (when payment should come)
+  // Next due date is one period after the cycle start
+  const cycleEnd = addPeriod(cycleStart, period, unit);
   const nextDueDate = cycleEnd;
 
-  // Calculate payments made in this cycle window
-  const payments = entry.payments || [];
+  // Payments made in this cycle (strictly after the last payment that started the cycle)
   const paidThisCycle = payments
     .filter((p) => {
       const pDate = new Date(p.date);
-      return pDate >= cycleStart && pDate < cycleEnd;
+      pDate.setHours(0, 0, 0, 0);
+      return pDate > cycleStart && pDate < cycleEnd;
     })
     .reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
 
