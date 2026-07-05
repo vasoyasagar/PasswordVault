@@ -1,4 +1,4 @@
-const SCOPES = 'https://www.googleapis.com/auth/drive.file';
+const SCOPES = 'openid email profile https://www.googleapis.com/auth/drive.file';
 
 let tokenClient = null;
 

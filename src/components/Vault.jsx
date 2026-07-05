@@ -1,9 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import EntryCard from './EntryCard';
 import EntryForm from './EntryForm';
 import PaymentHistory from './PaymentHistory';
+import AccessLog from './AccessLog';
 import ThemeToggle from './ThemeToggle';
 import { getUpcomingDues } from '../services/interest';
+import {
+  isBiometricAvailable,
+  isBiometricEnrolled,
+  enrollBiometric,
+  removeBiometric,
+} from '../services/biometric';
+import { pauseAutoLock, resumeAutoLock } from '../hooks/useAutoLock';
 
 const TABS = [
   { key: 'all', label: 'All', icon: '📋' },
@@ -15,7 +23,7 @@ const TABS = [
 ];
 
 export default function Vault({
-  entries, user, fileId, onAdd, onUpdate, onDelete, onShare, onSync, onLock, onSignOut, loading,
+  entries, user, fileId, onAdd, onUpdate, onDelete, onShare, onSync, onLock, onSignOut, loading, masterPassword,
 }) {
   const [activeTab, setActiveTab] = useState('all');
   const [search, setSearch] = useState('');
@@ -26,6 +34,36 @@ export default function Vault({
   const [shareEmail, setShareEmail] = useState('');
   const [showShare, setShowShare] = useState(false);
   const [paymentEntry, setPaymentEntry] = useState(null);
+  const [showAccessLog, setShowAccessLog] = useState(false);
+  const [biometricSupported, setBiometricSupported] = useState(false);
+  const [biometricEnabled, setBiometricEnabled] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const available = await isBiometricAvailable();
+      setBiometricSupported(available);
+      if (available && user?.email) {
+        setBiometricEnabled(isBiometricEnrolled(user.email));
+      }
+    })();
+  }, [user]);
+
+  const handleToggleBiometric = async () => {
+    if (biometricEnabled) {
+      removeBiometric();
+      setBiometricEnabled(false);
+    } else {
+      try {
+        pauseAutoLock();
+        await enrollBiometric(user.email, masterPassword);
+        setBiometricEnabled(true);
+      } catch {
+        // User cancelled or not supported
+      } finally {
+        resumeAutoLock();
+      }
+    }
+  };
 
   const filtered = entries.filter((e) => {
     const matchTab = activeTab === 'all' || e.category === activeTab;
@@ -151,6 +189,16 @@ export default function Vault({
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><polyline points="16 6 12 2 8 6" /><line x1="12" y1="2" x2="12" y2="15" /></svg>
                 Share Vault
               </button>
+              <button onClick={() => { setShowAccessLog(true); setShowMenu(false); }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                Access History
+              </button>
+              {biometricSupported && (
+                <button onClick={() => { handleToggleBiometric(); setShowMenu(false); }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 11c0-1.1.9-2 2-2s2 .9 2 2v3c0 1.1-.9 2-2 2" /><path d="M8 15V9a4 4 0 0 1 8 0" /><path d="M6 13V9a6 6 0 0 1 12 0v4" /></svg>
+                  {biometricEnabled ? 'Disable Biometrics' : 'Enable Biometrics'}
+                </button>
+              )}
               <button onClick={() => { onLock(); setShowMenu(false); }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                 Lock Vault
@@ -332,6 +380,11 @@ export default function Vault({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Access log modal */}
+      {showAccessLog && (
+        <AccessLog onClose={() => setShowAccessLog(false)} />
       )}
     </div>
   );

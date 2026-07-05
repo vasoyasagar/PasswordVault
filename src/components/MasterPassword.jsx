@@ -1,13 +1,42 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ThemeToggle from './ThemeToggle';
+import {
+  isBiometricAvailable,
+  isBiometricEnrolled,
+  authenticateBiometric,
+} from '../services/biometric';
+import { pauseAutoLock, resumeAutoLock } from '../hooks/useAutoLock';
 
 export default function MasterPassword({ user, onUnlock, onSignOut, loading, error }) {
   const [password, setPassword] = useState('');
   const [show, setShow] = useState(false);
+  const [biometricReady, setBiometricReady] = useState(false);
+  const [biometricError, setBiometricError] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      if (user?.email && await isBiometricAvailable() && isBiometricEnrolled(user.email)) {
+        setBiometricReady(true);
+      }
+    })();
+  }, [user]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (password.trim()) onUnlock(password);
+  };
+
+  const handleBiometric = async () => {
+    setBiometricError('');
+    try {
+      pauseAutoLock();
+      const storedPassword = await authenticateBiometric();
+      onUnlock(storedPassword, true);
+    } catch {
+      setBiometricError('Biometric failed. Use master password.');
+    } finally {
+      resumeAutoLock();
+    }
   };
 
   return (
@@ -30,6 +59,27 @@ export default function MasterPassword({ user, onUnlock, onSignOut, loading, err
         <p className="text-muted">This password encrypts your vault. Share it only with your family.</p>
 
         {error && <div className="error-msg">{error}</div>}
+        {biometricError && <div className="error-msg">{biometricError}</div>}
+
+        {biometricReady && (
+          <>
+            <button
+              className="btn-biometric"
+              onClick={handleBiometric}
+              disabled={loading}
+              type="button"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 11c0-1.1.9-2 2-2s2 .9 2 2v3c0 1.1-.9 2-2 2" />
+                <path d="M8 15V9a4 4 0 0 1 8 0" />
+                <path d="M6 13V9a6 6 0 0 1 12 0v4" />
+                <path d="M10 17a2 2 0 0 1-2-2V9a4 4 0 0 1 8 0" />
+              </svg>
+              Unlock with Biometrics
+            </button>
+            <div className="biometric-divider"><span>or enter password</span></div>
+          </>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div className="input-group">

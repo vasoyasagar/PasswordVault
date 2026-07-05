@@ -852,3 +852,86 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); }
   .vault { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
   .fab { bottom: calc(28px + env(safe-area-inset-bottom)); }
 }
+
+/* === Biometric Unlock === */
+.btn-biometric {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 20px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-biometric:hover { opacity: 0.9; }
+.btn-biometric:active { transform: scale(0.98); }
+.btn-biometric:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.biometric-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+.biometric-divider::before,
+.biometric-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* === Access Log === */
+.access-log-modal {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.access-log-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 12px;
+}
+.access-log-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+}
+.access-log-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.access-log-action {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+}
+.access-log-meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.access-log-time {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}

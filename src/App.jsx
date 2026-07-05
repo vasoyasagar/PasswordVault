@@ -9,6 +9,8 @@ import {
   shareVaultFile,
 } from './services/drive';
 import { encrypt, decrypt } from './services/crypto';
+import { recordAccess } from './services/accessLog';
+import useAutoLock from './hooks/useAutoLock';
 import Login from './components/Login';
 import MasterPassword from './components/MasterPassword';
 import Vault from './components/Vault';
@@ -60,7 +62,7 @@ export default function App() {
     return () => clearInterval(timer);
   }, []);
 
-  const handleUnlock = useCallback(async (password) => {
+  const handleUnlock = useCallback(async (password, viaBiometric = false) => {
     setLoading(true);
     setError('');
     try {
@@ -80,12 +82,13 @@ export default function App() {
       }
       setMasterPassword(password);
       setStep('vault');
+      recordAccess(user?.email, viaBiometric ? 'biometric-unlock' : 'unlock');
     } catch {
       setError('Wrong master password or failed to load vault.');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   const saveVault = useCallback(
     async (updated) => {
@@ -149,6 +152,7 @@ export default function App() {
       const vault = JSON.parse(json);
       setEntries(vault.entries || []);
       showToast('Vault synced');
+      recordAccess(user?.email, 'sync');
     } catch {
       showToast('Sync failed');
     } finally {
@@ -160,7 +164,11 @@ export default function App() {
     setMasterPassword('');
     setEntries([]);
     setStep('master');
-  }, []);
+    recordAccess(user?.email, 'lock');
+  }, [user]);
+
+  // Auto-lock on idle (5 min) or tab blur
+  useAutoLock(step === 'vault', handleLock);
 
   const handleSignOut = useCallback(() => {
     signOut(user?.token);
@@ -194,6 +202,7 @@ export default function App() {
           entries={entries}
           user={user}
           fileId={fileId}
+          masterPassword={masterPassword}
           onAdd={handleAdd}
           onUpdate={handleUpdate}
           onDelete={handleDelete}
