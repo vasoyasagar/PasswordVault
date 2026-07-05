@@ -8,7 +8,7 @@ function fmtDate(dateStr) {
   return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-export default function EntryCard({ entry, onEdit, onDelete, onViewPayments }) {
+export default function EntryCard({ entry, onEdit, onDelete, onViewPayments, onWhatsAppReminder }) {
   const [showSecret, setShowSecret] = useState(false);
   const [copied, setCopied] = useState('');
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -131,6 +131,11 @@ export default function EntryCard({ entry, onEdit, onDelete, onViewPayments }) {
           {onViewPayments && (
             <button className="btn-text btn-sm btn-payments" onClick={onViewPayments}>
               📊 Payments ({(entry.payments || []).length})
+            </button>
+          )}
+          {onWhatsAppReminder && (
+            <button className="btn-text btn-sm btn-whatsapp" onClick={() => onWhatsAppReminder(entry)}>
+              📲 Remind
             </button>
           )}
           <div className="entry-footer-right">

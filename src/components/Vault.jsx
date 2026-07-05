@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import EntryCard from './EntryCard';
 import EntryForm from './EntryForm';
 import PaymentHistory from './PaymentHistory';
+import InterestDashboard from './InterestDashboard';
 import AccessLog from './AccessLog';
 import ThemeToggle from './ThemeToggle';
-import { getUpcomingDues } from '../services/interest';
+import { getUpcomingDues, getInterestCycleInfo } from '../services/interest';
 import {
   isBiometricAvailable,
   isBiometricEnrolled,
@@ -12,6 +13,8 @@ import {
   removeBiometric,
 } from '../services/biometric';
 import { pauseAutoLock, resumeAutoLock } from '../hooks/useAutoLock';
+
+const WHATSAPP_NUMBER = localStorage.getItem('vault-whatsapp-number') || '';
 
 const TABS = [
   { key: 'all', label: 'All', icon: '📋' },
@@ -35,6 +38,9 @@ export default function Vault({
   const [showShare, setShowShare] = useState(false);
   const [paymentEntry, setPaymentEntry] = useState(null);
   const [showAccessLog, setShowAccessLog] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
+  const [showWhatsAppSetup, setShowWhatsAppSetup] = useState(false);
+  const [whatsappNumber, setWhatsappNumber] = useState(WHATSAPP_NUMBER);
   const [biometricSupported, setBiometricSupported] = useState(false);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
 
@@ -63,6 +69,28 @@ export default function Vault({
         resumeAutoLock();
       }
     }
+  };
+
+  const handleWhatsAppReminder = (entry) => {
+    const num = whatsappNumber || localStorage.getItem('vault-whatsapp-number');
+    if (!num) {
+      setShowWhatsAppSetup(true);
+      return;
+    }
+    const cycleInfo = getInterestCycleInfo(entry);
+    const name = entry.personName || entry.title;
+    const amount = cycleInfo ? `₹${cycleInfo.expectedAmount.toLocaleString('en-IN')}` : `₹${parseFloat(entry.amount || 0).toLocaleString('en-IN')}`;
+    const dueDate = cycleInfo ? cycleInfo.nextDueDate : '';
+    const msg = `💰 Payment Reminder\n\nName: ${name}\nAmount Due: ${amount}${dueDate ? `\nDue Date: ${dueDate}` : ''}\nPrincipal: ₹${parseFloat(entry.amount || 0).toLocaleString('en-IN')}\nRate: ${entry.interestRate || 0}%/month`;
+    const cleanNum = num.replace(/[^0-9]/g, '');
+    window.open(`https://wa.me/${cleanNum}?text=${encodeURIComponent(msg)}`, '_blank');
+  };
+
+  const saveWhatsAppNumber = () => {
+    const clean = whatsappNumber.replace(/[^0-9+]/g, '');
+    localStorage.setItem('vault-whatsapp-number', clean);
+    setWhatsappNumber(clean);
+    setShowWhatsAppSetup(false);
   };
 
   const filtered = entries.filter((e) => {
@@ -243,6 +271,9 @@ export default function Vault({
               <span className="summary-value text-success">₹{totalInterestReceived.toLocaleString('en-IN')}</span>
             </div>
           </div>
+          <button className="btn-dashboard" onClick={() => setShowDashboard(true)}>
+            📊 View Dashboard
+          </button>
         </div>
       )}
 
@@ -322,6 +353,7 @@ export default function Vault({
             onEdit={() => handleEdit(entry)}
             onDelete={() => onDelete(entry.id)}
             onViewPayments={entry.category === 'money' ? () => setPaymentEntry(entry) : undefined}
+            onWhatsAppReminder={entry.category === 'money' ? handleWhatsAppReminder : undefined}
           />
         ))}
       </div>
@@ -385,6 +417,37 @@ export default function Vault({
       {/* Access log modal */}
       {showAccessLog && (
         <AccessLog onClose={() => setShowAccessLog(false)} />
+      )}
+
+      {/* Interest Dashboard modal */}
+      {showDashboard && (
+        <InterestDashboard entries={entries} onClose={() => setShowDashboard(false)} />
+      )}
+
+      {/* WhatsApp number setup modal */}
+      {showWhatsAppSetup && (
+        <div className="modal-overlay" onClick={() => setShowWhatsAppSetup(false)}>
+          <div className="modal share-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>📲 WhatsApp Setup</h3>
+            <p className="text-muted">Enter your WhatsApp number to receive payment reminders.</p>
+            <div className="input-group">
+              <input
+                type="tel"
+                placeholder="e.g. 919876543210"
+                value={whatsappNumber}
+                onChange={(e) => setWhatsappNumber(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <p className="text-muted" style={{ fontSize: '0.75rem', marginTop: 8 }}>
+              Include country code without + (e.g. 91 for India)
+            </p>
+            <div className="modal-actions">
+              <button className="btn-ghost" onClick={() => setShowWhatsAppSetup(false)}>Cancel</button>
+              <button className="btn-primary" onClick={saveWhatsAppNumber} disabled={!whatsappNumber.trim()}>Save</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
